@@ -9,16 +9,35 @@ import {
 } from "react-native";
 import { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
+import filter from "lodash.filter";
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(false);
-  const [data, setData] = useState([]);
+  const [fullData, setFullData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [error, setError] = useState(null);
 
+  const contains = ({ name, email }, query) => {
+    const { first, last } = name;
+    if (
+      first.includes(query) ||
+      last.includes(query) ||
+      email.includes(query)
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
   const handleSearchQuery = (query) => {
     setSearchQuery(query);
+    const formattedQuery = query.toLowerCase();
+    const filterData = filter(fullData, (user) => {
+      return contains(user, formattedQuery);
+    });
+    setFilteredData(filterData);
   };
 
   const fetchData = async (url) => {
@@ -26,8 +45,8 @@ export default function App() {
       const response = await fetch(url);
       const json = await response.json();
       setIsLoading(false);
-      console.log(`json res:${JSON.stringify(json.results)}`);
-      setData(json.results);
+      setFullData(json.results);
+      setFilteredData(json.results);
     } catch (error) {
       setIsLoading(false);
       console.error(error);
@@ -66,7 +85,7 @@ export default function App() {
         onChangeText={(query) => handleSearchQuery(query)}
       />
       <ScrollView>
-        {data.map((item, idx) => {
+        {filteredData.map((item, idx) => {
           return (
             <View key={idx}>
               <Image
