@@ -21,23 +21,19 @@ export default function App() {
 
   return (
     <ScrollView>
-      {data &&
-        data.map((item, idx) => {
-          return (
-            <View key={idx}>
-              <Image
-                source={{ uri: item.picture.large }}
-                style={styles.image}
-              />
-              <View>
-                <Text style={styles.textName}>
-                  {item.name.first} {item.name.last}
-                </Text>
-                <Text style={styles.textEmail}>{item.login.username}</Text>
-              </View>
+      {data.map((item, idx) => {
+        return (
+          <View key={idx}>
+            <Image source={{ uri: item.picture.large }} style={styles.image} />
+            <View>
+              <Text style={styles.textName}>
+                {item.name.first} {item.name.last}
+              </Text>
+              <Text style={styles.textEmail}>{item.login.username}</Text>
             </View>
-          );
-        })}
+          </View>
+        );
+      })}
     </ScrollView>
   );
 }
