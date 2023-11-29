@@ -1,5 +1,4 @@
-import { StatusBar } from "expo-status-bar";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View, Image } from "react-native";
 import { useState, useEffect } from "react";
 
 export default function App() {
@@ -8,7 +7,8 @@ export default function App() {
   const fetchData = async (url) => {
     try {
       const response = await fetch(url);
-      const json = (await response).json;
+      const json = await response.json();
+      console.log(`json res:${JSON.stringify(json.results)}`);
       setData(json.results);
     } catch (error) {
       console.error(error);
@@ -20,20 +20,25 @@ export default function App() {
   }, []);
 
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-      <ScrollView>
-        {data.map((item, idx) => {
+    <ScrollView>
+      {data &&
+        data.map((item, idx) => {
           return (
             <View key={idx}>
-              <Image />
-              <View></View>
+              <Image
+                source={{ uri: item.picture.large }}
+                style={styles.image}
+              />
+              <View>
+                <Text style={styles.textName}>
+                  {item.name.first} {item.name.last}
+                </Text>
+                <Text style={styles.textEmail}>{item.login.username}</Text>
+              </View>
             </View>
           );
         })}
-      </ScrollView>
-    </View>
+    </ScrollView>
   );
 }
 
