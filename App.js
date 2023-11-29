@@ -5,6 +5,7 @@ import {
   View,
   Image,
   TextInput,
+  ActivityIndicator,
 } from "react-native";
 import { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -38,6 +39,21 @@ export default function App() {
     fetchData("https://randomuser.me/api/?results=20");
   }, []);
 
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size={"large"} color="#5500dc" />
+      </View>
+    );
+  }
+
+  if (!isLoading && error) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>Some Error in getting API response</Text>
+      </View>
+    );
+  }
   return (
     <SafeAreaView style={{ flex: 1, marginHorizontal: 20 }}>
       <TextInput
@@ -78,6 +94,7 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     borderWidth: 1,
     borderRadius: 8,
+    marginBottom: 5,
   },
   textFriends: {
     fontSize: 20,
