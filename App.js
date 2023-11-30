@@ -9,6 +9,7 @@ import {
   FlatList,
   TouchableOpacity,
   Pressable,
+  Button,
 } from "react-native";
 import { useState, useEffect, useRef } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -21,6 +22,7 @@ export default function App() {
   const [filteredData, setFilteredData] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [error, setError] = useState(null);
+  const selectedItem = useRef(null);
 
   const contains = ({ name, email }, query) => {
     const { first, last } = name;
@@ -62,6 +64,25 @@ export default function App() {
     fetchData("https://randomuser.me/api/?results=20");
   }, []);
 
+  useEffect(() => {
+    if (
+      selectedItem.current != null &&
+      filteredData.length === fullData.length
+    ) {
+      const selectedItemIndex = fullData.findIndex(
+        (item, idx) => item.login.uuid === selectedItem.current.login.uuid
+      );
+      selectedItem.current = null;
+      flatListRef.current.scrollToIndex({ index: selectedItemIndex });
+    }
+  }, [filteredData]);
+
+  const handleOnPress = (item, idx) => {
+    setSearchQuery("");
+    selectedItem.current = item;
+    setFilteredData(fullData);
+  };
+
   if (isLoading) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -77,12 +98,6 @@ export default function App() {
       </View>
     );
   }
-
-  const handleOnPress = (item, idx) => {
-    setSearchQuery("");
-    setFilteredData(fullData);
-    flatListRef.current.scrollToItem(item);
-  };
   return (
     <SafeAreaView style={{ flex: 1, marginHorizontal: 20 }}>
       <TextInput
@@ -95,6 +110,7 @@ export default function App() {
         onChangeText={(query) => handleSearchQuery(query)}
       />
       <FlatList
+        initialNumToRender={20}
         ref={flatListRef}
         data={filteredData}
         keyExtractor={(item) => item.login.uuid}
