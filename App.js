@@ -6,6 +6,7 @@ import {
   Image,
   TextInput,
   ActivityIndicator,
+  FlatList,
 } from "react-native";
 import { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -84,24 +85,24 @@ export default function App() {
         value={searchQuery}
         onChangeText={(query) => handleSearchQuery(query)}
       />
-      <ScrollView>
-        {filteredData.map((item, idx) => {
-          return (
-            <View key={idx}>
-              <Image
-                source={{ uri: item.picture.large }}
-                style={styles.image}
-              />
-              <View>
-                <Text style={styles.textName}>
-                  {item.name.first} {item.name.last}
-                </Text>
-                <Text style={styles.textEmail}>{item.login.username}</Text>
-              </View>
+      <FlatList
+        data={filteredData}
+        keyExtractor={(item) => item.login.uuid}
+        renderItem={({ item }) => (
+          <View style={styles.itemContainer}>
+            <Image
+              style={{ height: 50, width: 50, borderRadius: 25 }}
+              source={{ uri: item.picture.thumbnail }}
+            />
+            <View>
+              <Text style={styles.textName}>
+                {item.name.first} {item.name.last}{" "}
+              </Text>
+              <Text style={styles.textEmail}>{item.email}</Text>
             </View>
-          );
-        })}
-      </ScrollView>
+          </View>
+        )}
+      />
     </SafeAreaView>
   );
 }
@@ -143,4 +144,13 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     color: "grey",
   },
+  itemContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginLeft: 10,
+    marginTop: 10,
+  },
+  imageStyle: { width: 50, height: 50, borderRadius: 25 },
+  textName: { fontSize: 17, marginLeft: 10 },
+  textEmail: { fontSize: 14, marginLeft: 10 },
 });
