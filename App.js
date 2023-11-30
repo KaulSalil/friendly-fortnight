@@ -7,12 +7,15 @@ import {
   TextInput,
   ActivityIndicator,
   FlatList,
+  TouchableOpacity,
+  Pressable,
 } from "react-native";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import filter from "lodash.filter";
 
 export default function App() {
+  const flatListRef = useRef(null);
   const [isLoading, setIsLoading] = useState(false);
   const [fullData, setFullData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
@@ -74,6 +77,12 @@ export default function App() {
       </View>
     );
   }
+
+  const handleOnPress = (item, idx) => {
+    setSearchQuery("");
+    setFilteredData(fullData);
+    flatListRef.current.scrollToItem(item);
+  };
   return (
     <SafeAreaView style={{ flex: 1, marginHorizontal: 20 }}>
       <TextInput
@@ -86,22 +95,30 @@ export default function App() {
         onChangeText={(query) => handleSearchQuery(query)}
       />
       <FlatList
+        ref={flatListRef}
         data={filteredData}
         keyExtractor={(item) => item.login.uuid}
-        renderItem={({ item }) => (
-          <View style={styles.itemContainer}>
-            <Image
-              style={{ height: 50, width: 50, borderRadius: 25 }}
-              source={{ uri: item.picture.thumbnail }}
-            />
-            <View>
-              <Text style={styles.textName}>
-                {item.name.first} {item.name.last}{" "}
-              </Text>
-              <Text style={styles.textEmail}>{item.email}</Text>
-            </View>
-          </View>
-        )}
+        renderItem={({ item, index }) => {
+          return (
+            <TouchableOpacity
+              style={styles.itemContainer}
+              onPress={() => {
+                handleOnPress(item, index);
+              }}
+            >
+              <Image
+                style={{ height: 50, width: 50, borderRadius: 25 }}
+                source={{ uri: item.picture.thumbnail }}
+              />
+              <View>
+                <Text style={styles.textName}>
+                  {item.name.first} {item.name.last}{" "}
+                </Text>
+                <Text style={styles.textEmail}>{item.email}</Text>
+              </View>
+            </TouchableOpacity>
+          );
+        }}
       />
     </SafeAreaView>
   );
